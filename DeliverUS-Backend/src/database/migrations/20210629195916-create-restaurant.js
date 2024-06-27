@@ -18,6 +18,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      discount: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
       postalCode: {
         allowNull: false,
         type: Sequelize.STRING

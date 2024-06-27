@@ -1,4 +1,4 @@
-import { Product, Order, Restaurant, RestaurantCategory, ProductCategory } from '../models/models.js'
+import { Product, Order, Restaurant, RestaurantCategory, ProductCategory, sequelizeSession } from '../models/models.js'
 import Sequelize from 'sequelize'
 
 const indexRestaurant = async function (req, res) {
@@ -38,6 +38,7 @@ const show = async function (req, res) {
 
 const create = async function (req, res) {
   let newProduct = Product.build(req.body)
+  newProduct.basePrice = newProduct.price
   try {
     newProduct = await newProduct.save()
     res.json(newProduct)
@@ -48,6 +49,7 @@ const create = async function (req, res) {
 
 const update = async function (req, res) {
   try {
+    req.body.basePrice = req.body.price
     await Product.update(req.body, { where: { id: req.params.productId } })
     const updatedProduct = await Product.findByPk(req.params.productId)
     res.json(updatedProduct)
@@ -107,12 +109,35 @@ const popular = async function (req, res) {
   }
 }
 
+const promote = async function (req, res) {
+  const t = await sequelizeSession.transaction()
+  try {
+    const existPromoted = await Product.findAll({ where: { promoted: true } })
+    if (existPromoted) {
+      await Product.update(
+        { promoted: false },
+        { where: { id: existPromoted.id }, t }
+      )
+    }
+
+    await Product.update(
+      { promoted: true },
+      { where: { id: req.params.productId }, t }
+    )
+
+    await t.commit()
+    res.status(200).send('Product promoted successfully')
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
 const ProductController = {
   indexRestaurant,
   show,
   create,
   update,
   destroy,
-  popular
+  popular,
+  promote
 }
 export default ProductController

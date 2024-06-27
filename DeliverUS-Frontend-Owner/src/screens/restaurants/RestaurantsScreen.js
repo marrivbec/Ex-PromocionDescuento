@@ -26,11 +26,20 @@ export default function RestaurantsScreen ({ navigation, route }) {
     }
   }, [loggedInUser, route])
 
+  const renderTitleWithDiscount = (item) => {
+    return (<>
+        <TextSemiBold style = {{ fontSize: 20 }}>{item.name}</TextSemiBold>
+        {(item.discount > 0) &&
+          <TextSemiBold style={{ marginLeft: 5, color: GlobalStyles.brandPrimary }}>
+            ({item.discount}% of discount)</TextSemiBold>}
+      </>)
+  }
+
   const renderRestaurant = ({ item }) => {
     return (
       <ImageCard
         imageUri={item.logo ? { uri: process.env.API_BASE_URL + '/' + item.logo } : restaurantLogo}
-        title={item.name}
+        title={renderTitleWithDiscount(item)}
         onPress={() => {
           navigation.navigate('RestaurantDetailScreen', { id: item.id })
         }}

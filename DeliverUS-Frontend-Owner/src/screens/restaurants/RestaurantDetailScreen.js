@@ -4,7 +4,7 @@ import { StyleSheet, View, FlatList, ImageBackground, Image, Pressable } from 'r
 import { showMessage } from 'react-native-flash-message'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { getDetail } from '../../api/RestaurantEndpoints'
-import { remove } from '../../api/ProductEndpoints'
+import { remove, promote } from '../../api/ProductEndpoints'
 import ImageCard from '../../components/ImageCard'
 import TextRegular from '../../components/TextRegular'
 import TextSemiBold from '../../components/TextSemibold'
@@ -61,10 +61,17 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
         title={item.name}
       >
         <TextRegular numberOfLines={2}>{item.description}</TextRegular>
-        <TextSemiBold textStyle={styles.price}>{item.price.toFixed(2)}€</TextSemiBold>
+        <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }]}>
+
+        <TextSemiBold textStyle={styles.price}>{item.basePrice}€</TextSemiBold>
+        <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+        {!item.promoted && <TextSemiBold style = {{ color: GlobalStyles.brandPrimary }} >Price promoted: {item.price}</TextSemiBold>}
+        </View>
         {!item.availability &&
           <TextRegular textStyle={styles.availability }>Not available</TextRegular>
         }
+        </View>
+
          <View style={styles.actionButtonsContainer}>
           <Pressable
             onPress={() => navigation.navigate('EditProductScreen', { id: item.id })
@@ -99,6 +106,24 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
             <MaterialCommunityIcons name='delete' color={'white'} size={20}/>
             <TextRegular textStyle={styles.text}>
               Delete
+            </TextRegular>
+          </View>
+        </Pressable>
+        <Pressable
+            onPress={() => { promoteProduct(item) }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed
+                  ? GlobalStyles.brandSuccessTap
+                  : GlobalStyles.brandSuccess
+              },
+              styles.actionButton
+            ]}>
+          <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+            <MaterialCommunityIcons name={item.promote ? 'star-outline' : 'star'} color={'white'} size={20}/>
+            <TextRegular textStyle={styles.text}>
+              {item.promoted && <TextRegular textStyle={styles.text}>Demote</TextRegular>}
+              {!item.promoted && <TextRegular textStyle={styles.text}>Promote</TextRegular>}
             </TextRegular>
           </View>
         </Pressable>
@@ -145,6 +170,27 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
       setProductToBeDeleted(null)
       showMessage({
         message: `Product ${product.name} could not be removed.`,
+        type: 'error',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    }
+  }
+
+  const promoteProduct = async (product) => {
+    try {
+      await promote(product.id)
+      await fetchRestaurantDetail()
+      showMessage({
+        message: `Product ${product.name} succesfully promoted`,
+        type: 'success',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    } catch (error) {
+      console.log(error)
+      showMessage({
+        message: `Product ${product.name} could not be promoted.`,
         type: 'error',
         style: GlobalStyles.flashStyle,
         titleStyle: GlobalStyles.flashTextStyle
@@ -237,7 +283,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf: 'center',
     flexDirection: 'column',
-    width: '50%'
+    width: '33%'
   },
   actionButtonsContainer: {
     flexDirection: 'row',

@@ -18,8 +18,8 @@ module.exports = {
       [
       // Casa felix id=1
       // Starters id=1
-        { name: 'Ensaladilla', description: 'Tuna salad with mayonnaise', price: 2.5, image: process.env.PRODUCTS_FOLDER + '/ensaladilla.jpeg', order: 1, availability: true, restaurantId: 1, productCategoryId: 1 },
-        { name: 'Olives', description: 'Home made', price: 1.5, image: process.env.PRODUCTS_FOLDER + '/aceitunas.jpeg', order: 2, availability: true, restaurantId: 1, productCategoryId: 1 },
+        { name: 'Ensaladilla', description: 'Tuna salad with mayonnaise', price: 2.5, basePrice: 2.5, image: process.env.PRODUCTS_FOLDER + '/ensaladilla.jpeg', order: 1, availability: true, restaurantId: 1, productCategoryId: 1 },
+        { name: 'Olives', description: 'Home made', price: 1.5, basePrice: 1.5, image: process.env.PRODUCTS_FOLDER + '/aceitunas.jpeg', order: 2, availability: true, restaurantId: 1, productCategoryId: 1 },
 
         // drinks id=3
         { name: 'Coca-cola', description: '33 cc', price: 1.5, image: process.env.PRODUCTS_FOLDER + '/cola.jpeg', order: 3, availability: true, restaurantId: 1, productCategoryId: 3 },
