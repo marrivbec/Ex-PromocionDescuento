@@ -1,4 +1,4 @@
-import { Product, Order, Restaurant, RestaurantCategory, ProductCategory, sequelizeSession } from '../models/models.js'
+import { Product, Order, Restaurant, RestaurantCategory, ProductCategory } from '../models/models.js'
 import Sequelize from 'sequelize'
 
 const indexRestaurant = async function (req, res) {
@@ -110,9 +110,9 @@ const popular = async function (req, res) {
 }
 
 const promote = async function (req, res) {
-  const t = await sequelizeSession.transaction()
+  // const t = await sequelizeSession.transaction()
   try {
-    const existPromoted = await Product.findAll({ where: { promoted: true } })
+    /* const existPromoted = await Product.findOne({ where: { promoted: true } })
     if (existPromoted) {
       await Product.update(
         { promoted: false },
@@ -125,8 +125,11 @@ const promote = async function (req, res) {
       { where: { id: req.params.productId }, t }
     )
 
-    await t.commit()
+    await t.commit() */
+    const product = await Product.findByPk(req.params.productId)
+    product.promoted = !product.promoted
     res.status(200).send('Product promoted successfully')
+    await product.save()
   } catch (err) {
     res.status(500).send(err)
   }
